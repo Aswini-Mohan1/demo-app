@@ -44,8 +44,8 @@ jobs:
 
       - name: Wait before deletion
         run: |
-          echo "Waiting..."
-          sleep ${{ vars.DELETE_AFTER }}
+          echo "Waiting for 300 seconds..."
+          sleep 300
 
       - name: Get Artifact ID
         id: get_artifact
