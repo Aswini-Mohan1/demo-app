@@ -41,3 +41,25 @@ jobs:
           name: app-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
           retention-days: 1
+
+      # WAIT (15 minutes from variable)
+      - name: Wait before deletion
+        run: sleep ${{ vars.DELETE_AFTER }}
+
+      # Get Artifact ID
+      - name: Get Artifact ID
+        id: get_artifact
+        run: |
+          ARTIFACT_ID=$(curl -s \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
+          | jq '.artifacts[0].id')
+
+          echo "artifact_id=$ARTIFACT_ID" >> $GITHUB_OUTPUT
+
+      #  Delete Artifact
+      - name: Delete Artifact
+        run: |
+          curl -X DELETE \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ steps.get_artifact.outputs.artifact_id }}
